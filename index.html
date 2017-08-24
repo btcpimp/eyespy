@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+<link href="https://fonts.googleapis.com/css?family=IM+Fell+English|IM+Fell+English+SC" rel="stylesheet">
+    <title>eyespy pir8 votes</title>
+</head>
+
+<style>
+
+body {
+font-family: 'IM Fell English SC', serif;
+margin: 0 auto;
+text-align: center;
+}
+
+p {
+    font-size:calc(18px + 1vw);
+    background-color: #000000;
+    color: white;
+    margin-top: 25px;
+    margin-left: 10%;
+    margin-right: 10%;
+    padding: 10px;
+    font-family: 'IM Fell English', serif;
+    border-radius: 10px;
+}
+
+fieldset {
+    width: 150px;
+    margin: 0 auto;
+    background: #ddd;
+    border-radius: 10px;
+}
+
+button {
+   width: 100%;
+   background: black;
+   color: white;
+   font-size:calc(18px + 1vw)
+
+}
+
+.spy {
+    font-family: 'IM Fell English SC', serif;
+    border-radius: 10px;
+}
+
+input {
+   height: 30px;
+   font-family: 'IM Fell English SC', serif;
+   font-size:calc(14px + 1vw)
+}
+
+#voters {
+    border-radius: 8px;
+}
+
+.container {
+/* Style the containers with a rounded border, grey background, etc */
+    border: 2px solid #ccc;
+    background-color: #eee;
+    border-radius: 10px;
+    padding: 16px;
+    margin: 16px 0;
+    display: flex;
+}
+
+
+/* Style the image as a circle */
+.background img {
+    object-fit: cover;
+    width:420px;
+    display: block;
+    vertical-align: top;   
+    margin-top: 2.5%;
+}
+
+ul {
+  list-style-type: none;
+}
+
+</style>
+
+
+<body>
+
+<center><div class="background">
+<script>
+function pictureChange()
+{
+document.getElementById("image2").src="img/open-chest.jpg";
+}
+
+</script>
+
+<img id="image2" src="img/closed-chest.jpg">
+<!--<img id="image2" src="img/open-chest.jpg">-->
+
+</div></center>
+
+
+<h1>eyespy pir8 votes</h1>
+<p>Arg! Who will ye spy upon, Matey?</p>
+
+<div class="container">
+<fieldset>
+<input id="voters" placeholder="pir8 name" type="text">
+</fieldset>
+<fieldset>
+<button class="spy" id="watch" onclick="pictureChange()">Aye, Spy!</button>
+</fieldset>
+</div>
+<h3 id="status"></h3>
+<div id="logs"></div>
+
+<script src="//cdn.steemjs.com/lib/latest/steem.min.js"></script>
+
+<script>
+
+  var releaseStream = Function.prototype;
+  var watchBtn = document.getElementById("watch");
+  function onWatchBtnClick (event) {
+    releaseStream();
+    var voters = document.getElementById("voters").value.split(",").map(function (voter) {
+      return voter.trim();
+    });
+    printStatus(voters);
+    releaseStream = steem.api.streamOperations(function onOperation(error, operation) {
+      if (error) throw error;
+      var type = operation[0];
+      var info = operation[1];
+      if (type != "vote") return;
+      if (voters.indexOf(info.voter) == -1) return;
+      log(info);
+    });
+  }
+  watchBtn.addEventListener("click", onWatchBtnClick);
+
+  function log(info) {
+    var logs = document.getElementById("logs");
+    var p = document.createElement("p");
+    var a = document.createElement("a");
+    p.innerHTML =
+      "<b>" + info.voter + "</b>" +
+      " voted with weight " +
+      "<b>" + info.weight + "</b>" + " for post: ";
+    var link = "https://steemit.com/@" + info.author  + "/" + info.permlink;
+    a.href = link;
+    a.innerHTML = link;
+    p.appendChild(a);
+    logs.appendChild(p);
+  }
+
+
+  function printStatus(voters) {
+    var status = document.getElementById("status");
+    status.innerHTML = "I spy a pir8, aye!:";
+    voters.forEach(function (voter) {
+      var a = document.createElement("a");
+      a.href = "https://steemit.com/@" + voter;
+      status.innerHTML += " ";
+      a.innerHTML = "@" + voter;
+      status.appendChild(a);
+    });
+  }
+
+</script>
+
+<footer>
+<div class="footer"><h1>the pir8aye network</h1>
+<ul>
+<li>Site created by <a href="https://steemit.com/@pir8aye">@pir8aye</a></li>With code from <a href="https://steemit.com/steem/@pal/watch-them-vote-script-in-browser-using-steem-js-library">@pal</a>
+</li>
+<li>Source on <a href="">GitHub</a></li>
+
+
+</footer>
+</body>
+</html>
